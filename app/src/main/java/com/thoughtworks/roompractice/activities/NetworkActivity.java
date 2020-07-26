@@ -2,13 +2,13 @@ package com.thoughtworks.roompractice.activities;
 
 import android.os.Bundle;
 import android.widget.Button;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.thoughtworks.roompractice.R;
-import com.thoughtworks.roompractice.common.MyApplication;
 import com.thoughtworks.roompractice.common.RxManager;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
@@ -22,6 +22,8 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
+
+import static com.thoughtworks.roompractice.common.ToastUtil.showToast;
 
 public class NetworkActivity extends AppCompatActivity {
     private static final String URL = "https://twc-android-bootcamp.github.io/fake-data/data/default.json";
@@ -44,7 +46,40 @@ public class NetworkActivity extends AppCompatActivity {
     }
 
     private void request() {
-        Observable.create((ObservableOnSubscribe<String>) emitter -> {
+        Observable.create(createObservable()).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(createObserver());
+    }
+
+    @NotNull
+    private Observer<String> createObserver() {
+        return new Observer<String>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+                requestButton.setClickable(false);
+                rxManager.add(d);
+            }
+
+            @Override
+            public void onNext(String s) {
+                showToast(s);
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                showToast(e.getMessage());
+            }
+
+            @Override
+            public void onComplete() {
+                requestButton.setClickable(true);
+            }
+        };
+    }
+
+    @NotNull
+    private ObservableOnSubscribe<String> createObservable() {
+        return emitter -> {
             OkHttpClient okHttpClient = new OkHttpClient();
             Request.Builder requestBuilder = new Request.Builder();
             Request request = requestBuilder.url(URL).build();
@@ -61,33 +96,7 @@ public class NetworkActivity extends AppCompatActivity {
             } catch (IOException e) {
                 emitter.onError(e);
             }
-        }).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<String>() {
-                    @Override
-                    public void onSubscribe(Disposable d) {
-                        requestButton.setClickable(false);
-                        rxManager.add(d);
-                    }
-
-                    @Override
-                    public void onNext(String s) {
-                        showToast(s);
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        showToast(e.getMessage());
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        requestButton.setClickable(true);
-                    }
-                });
+        };
     }
 
-    private void showToast(String message) {
-        Toast.makeText(MyApplication.getMyContext(), message, Toast.LENGTH_SHORT).show();
-    }
 }
