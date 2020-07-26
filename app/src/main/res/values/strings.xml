@@ -6,4 +6,6 @@
     <string name="age_edit_text_placeholder">please input age</string>
     <string name="gender_edit_text_placeholder">please input gender</string>
     <string name="submit">Submit</string>
+    <string name="network_activity">NetworkActivity</string>
+    <string name="request">Request</string>
 </resources>

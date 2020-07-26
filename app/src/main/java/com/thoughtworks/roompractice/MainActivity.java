@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.thoughtworks.roompractice.activities.NetworkActivity;
 import com.thoughtworks.roompractice.activities.SubmitActivity;
 import com.thoughtworks.roompractice.activities.ViewActivity;
 
@@ -17,6 +18,13 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.submit_activity).setOnClickListener(view -> createSubmitActivity());
 
         findViewById(R.id.view_activity).setOnClickListener(view -> createViewActivity());
+
+        findViewById(R.id.network_activity).setOnClickListener(view -> createNetworkActivity());
+    }
+
+    private void createNetworkActivity() {
+        Intent intent = new Intent(this, NetworkActivity.class);
+        startActivity(intent);
     }
 
     private void createViewActivity() {
